@@ -1,0 +1,13 @@
+# Money Radar 数据文件
+blogwatcher-cli.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
