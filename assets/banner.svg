@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <radialGradient id="bgGlow" cx="0.32" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#1a1400" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#08090a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sweepGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0"/>
+      <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#eab308" stop-opacity="0.28"/>
+    </linearGradient>
+    <linearGradient id="sweepLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#f59e0b" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#eab308" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="dishGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="radarClip">
+      <circle cx="380" cy="320" r="185"/>
+    </clipPath>
+  </defs>
+
+  <style>
+    @keyframes pulse1 {
+      0%   { opacity: 0.35; stroke-width: 1.5; }
+      50%  { opacity: 0.12; stroke-width: 1; }
+      100% { opacity: 0.35; stroke-width: 1.5; }
+    }
+    @keyframes pulse2 {
+      0%   { opacity: 0.25; stroke-width: 1.2; }
+      50%  { opacity: 0.08; stroke-width: 0.8; }
+      100% { opacity: 0.25; stroke-width: 1.2; }
+    }
+    @keyframes pulse3 {
+      0%   { opacity: 0.18; stroke-width: 1; }
+      50%  { opacity: 0.05; stroke-width: 0.6; }
+      100% { opacity: 0.18; stroke-width: 1; }
+    }
+    @keyframes sweepRotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes blip1 {
+      0%   { opacity: 0.9; }
+      30%  { opacity: 0.4; }
+      100% { opacity: 0; }
+    }
+    @keyframes blip2 {
+      0%   { opacity: 0.7; }
+      40%  { opacity: 0.3; }
+      100% { opacity: 0; }
+    }
+    .ring1 { animation: pulse1 3s ease-in-out infinite; }
+    .ring2 { animation: pulse2 3s ease-in-out infinite 0.5s; }
+    .ring3 { animation: pulse3 3s ease-in-out infinite 1s; }
+    .sweep-group { 
+      animation: sweepRotate 4s linear infinite;
+      transform-origin: 380px 320px;
+    }
+    .blip1 { animation: blip1 4s linear infinite 0.5s; }
+    .blip2 { animation: blip2 4s linear infinite 2s; }
+    .blip3 { animation: blip1 4s linear infinite 3s; }
+  </style>
+
+  <!-- Background -->
+  <rect width="1280" height="640" fill="#08090a"/>
+  <rect width="1280" height="640" fill="url(#bgGlow)"/>
+
+  <!-- Radar rings -->
+  <circle cx="380" cy="320" r="55"  fill="none" stroke="#f59e0b" class="ring1" stroke-opacity="0.35" stroke-width="1.5"/>
+  <circle cx="380" cy="320" r="110" fill="none" stroke="#f59e0b" class="ring2" stroke-opacity="0.25" stroke-width="1.2"/>
+  <circle cx="380" cy="320" r="165" fill="none" stroke="#f59e0b" class="ring3" stroke-opacity="0.18" stroke-width="1"/>
+
+  <!-- Cross-hairs -->
+  <line x1="380" y1="130" x2="380" y2="510" stroke="#f59e0b" stroke-opacity="0.08" stroke-width="0.8"/>
+  <line x1="195" y1="320" x2="565" y2="320" stroke="#f59e0b" stroke-opacity="0.08" stroke-width="0.8"/>
+
+  <!-- Radar sweep (pie wedge) -->
+  <g clip-path="url(#radarClip)" class="sweep-group">
+    <path d="M380,320 L380,135 A185,185 0 0,1 540,220 Z" fill="url(#sweepGrad)"/>
+    <line x1="380" y1="320" x2="540" y2="220" stroke="url(#sweepLine)" stroke-width="2" filter="url(#glow)"/>
+  </g>
+
+  <!-- Blips (detected signals) -->
+  <circle cx="415" cy="225" r="4" fill="#f59e0b" class="blip1" filter="url(#softGlow)"/>
+  <circle cx="460" cy="285" r="3.5" fill="#eab308" class="blip2" filter="url(#softGlow)"/>
+  <circle cx="335" cy="250" r="3" fill="#f59e0b" class="blip3" filter="url(#softGlow)"/>
+
+  <!-- Center dot -->
+  <circle cx="380" cy="320" r="5" fill="#eab308" filter="url(#glow)"/>
+  <circle cx="380" cy="320" r="2.5" fill="#fef3c7"/>
+
+  <!-- Radar dish base/stand (geometric, minimal) -->
+  <path d="M365,330 L380,365 L395,330" fill="none" stroke="url(#dishGrad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="380" y1="365" x2="380" y2="385" stroke="#b45309" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="365" y1="385" x2="395" y2="385" stroke="#b45309" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Text: Money Radar -->
+  <text x="660" y="280" font-family="'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="72" font-weight="700" fill="#f7f8f8" letter-spacing="-1">
+    Money Radar
+  </text>
+
+  <!-- Decorative line under title -->
+  <line x1="660" y1="300" x2="860" y2="300" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Subtitle -->
+  <text x="660" y="345" font-family="'Inter', 'Segoe UI', 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif" font-size="26" font-weight="400" fill="#9ca3af" letter-spacing="0.5">
+    赚钱雷达 · 让赚钱机会主动找到你
+  </text>
+
+  <!-- Small accent dots -->
+  <circle cx="648" cy="275" r="3" fill="#f59e0b" opacity="0.5"/>
+  <circle cx="648" cy="275" r="6" fill="#f59e0b" opacity="0.15"/>
+</svg>

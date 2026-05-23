@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <radialGradient id="iconBgGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#1a1400" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#08090a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="iconSweepGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0"/>
+      <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#eab308" stop-opacity="0.32"/>
+    </linearGradient>
+    <linearGradient id="iconSweepLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#f59e0b" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#eab308" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="iconDishGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <filter id="iconGlow">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="iconSoftGlow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <clipPath id="iconRadarClip">
+      <circle cx="128" cy="118" r="100"/>
+    </clipPath>
+  </defs>
+
+  <style>
+    @keyframes iPulse1 {
+      0%   { opacity: 0.4; stroke-width: 1.5; }
+      50%  { opacity: 0.12; stroke-width: 1; }
+      100% { opacity: 0.4; stroke-width: 1.5; }
+    }
+    @keyframes iPulse2 {
+      0%   { opacity: 0.28; stroke-width: 1.2; }
+      50%  { opacity: 0.08; stroke-width: 0.8; }
+      100% { opacity: 0.28; stroke-width: 1.2; }
+    }
+    @keyframes iPulse3 {
+      0%   { opacity: 0.18; stroke-width: 1; }
+      50%  { opacity: 0.05; stroke-width: 0.6; }
+      100% { opacity: 0.18; stroke-width: 1; }
+    }
+    @keyframes iSweepRotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes iBlip1 {
+      0%   { opacity: 0.9; }
+      30%  { opacity: 0.4; }
+      100% { opacity: 0; }
+    }
+    @keyframes iBlip2 {
+      0%   { opacity: 0.7; }
+      40%  { opacity: 0.3; }
+      100% { opacity: 0; }
+    }
+    .iring1 { animation: iPulse1 3s ease-in-out infinite; }
+    .iring2 { animation: iPulse2 3s ease-in-out infinite 0.5s; }
+    .iring3 { animation: iPulse3 3s ease-in-out infinite 1s; }
+    .isweep-group { 
+      animation: iSweepRotate 4s linear infinite;
+      transform-origin: 128px 118px;
+    }
+    .iblip1 { animation: iBlip1 4s linear infinite 0.5s; }
+    .iblip2 { animation: iBlip2 4s linear infinite 2s; }
+    .iblip3 { animation: iBlip1 4s linear infinite 3s; }
+  </style>
+
+  <!-- Background -->
+  <rect width="256" height="256" rx="40" fill="#08090a"/>
+  <rect width="256" height="256" rx="40" fill="url(#iconBgGlow)"/>
+
+  <!-- Radar rings -->
+  <circle cx="128" cy="118" r="30"  fill="none" stroke="#f59e0b" class="iring1" stroke-opacity="0.4" stroke-width="1.5"/>
+  <circle cx="128" cy="118" r="60"  fill="none" stroke="#f59e0b" class="iring2" stroke-opacity="0.28" stroke-width="1.2"/>
+  <circle cx="128" cy="118" r="92"  fill="none" stroke="#f59e0b" class="iring3" stroke-opacity="0.18" stroke-width="1"/>
+
+  <!-- Cross-hairs -->
+  <line x1="128" y1="22" x2="128" y2="214" stroke="#f59e0b" stroke-opacity="0.07" stroke-width="0.7"/>
+  <line x1="32" y1="118" x2="224" y2="118" stroke="#f59e0b" stroke-opacity="0.07" stroke-width="0.7"/>
+
+  <!-- Radar sweep -->
+  <g clip-path="url(#iconRadarClip)" class="isweep-group">
+    <path d="M128,118 L128,18 A100,100 0 0,1 214,68 Z" fill="url(#iconSweepGrad)"/>
+    <line x1="128" y1="118" x2="214" y2="68" stroke="url(#iconSweepLine)" stroke-width="1.8" filter="url(#iconGlow)"/>
+  </g>
+
+  <!-- Blips -->
+  <circle cx="148" cy="68" r="3.5" fill="#f59e0b" class="iblip1" filter="url(#iconSoftGlow)"/>
+  <circle cx="172" cy="100" r="3" fill="#eab308" class="iblip2" filter="url(#iconSoftGlow)"/>
+  <circle cx="108" cy="80" r="2.5" fill="#f59e0b" class="iblip3" filter="url(#iconSoftGlow)"/>
+
+  <!-- Center dot -->
+  <circle cx="128" cy="118" r="4.5" fill="#eab308" filter="url(#iconGlow)"/>
+  <circle cx="128" cy="118" r="2" fill="#fef3c7"/>
+
+  <!-- Dish base -->
+  <path d="M116,126 L128,150 L140,126" fill="none" stroke="url(#iconDishGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="128" y1="150" x2="128" y2="168" stroke="#b45309" stroke-width="2.2" stroke-linecap="round"/>
+  <line x1="114" y1="168" x2="142" y2="168" stroke="#b45309" stroke-width="2.2" stroke-linecap="round"/>
+
+  <!-- Subtle ¥ symbol at bottom -->
+  <text x="128" y="210" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="28" font-weight="700" fill="#f59e0b" text-anchor="middle" opacity="0.2">¥</text>
+</svg>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money Radar — 赚钱雷达</title>
+  <meta name="description" content="自动监控全网高价值信息源，AI筛选+定时推送，让赚钱机会主动找到你。">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;510;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #08090a; --bg-panel: #0f1011; --bg-surface: #191a1b; --bg-hover: #28282c;
+      --text-primary: #f7f8f8; --text-secondary: #d0d6e0; --text-tertiary: #8a8f98; --text-muted: #62666d;
+      --accent: #f59e0b; --accent-hover: #eab308; --accent-light: #fbbf24; --accent-dim: rgba(245,158,11,0.15);
+      --border: rgba(255,255,255,0.05); --border-std: rgba(255,255,255,0.08);
+      --radius: 8px; --radius-lg: 12px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text-secondary); line-height: 1.5; font-feature-settings: "cv01", "ss03"; overflow-x: hidden; }
+    a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent-light); }
+    code, pre { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace; }
+
+    /* Nav */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(8,9,10,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    nav .inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; }
+    nav .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; color: var(--text-primary); font-size: 15px; letter-spacing: -0.01em; }
+    nav .logo svg { width: 28px; height: 28px; }
+    nav .links { display: flex; gap: 28px; align-items: center; }
+    nav .links a { color: var(--text-tertiary); font-size: 13px; font-weight: 510; transition: color 0.15s; }
+    nav .links a:hover { color: var(--text-primary); }
+    nav .cta-btn { background: var(--accent); color: #000; font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 6px; transition: background 0.15s; }
+    nav .cta-btn:hover { background: var(--accent-light); color: #000; }
+
+    /* Hero */
+    .hero { position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 120px 24px 80px; }
+    .hero-radar { position: absolute; left: -5%; top: 50%; transform: translateY(-50%); width: 700px; height: 700px; opacity: 0.4; pointer-events: none; }
+    .hero-radar .ring { position: absolute; top: 50%; left: 50%; border-radius: 50%; border: 1px solid var(--accent); }
+    .hero-radar .ring:nth-child(1) { width: 200px; height: 200px; margin: -100px 0 0 -100px; animation: radar-pulse 3s ease-in-out infinite; }
+    .hero-radar .ring:nth-child(2) { width: 360px; height: 360px; margin: -180px 0 0 -180px; animation: radar-pulse 3s ease-in-out infinite 0.6s; border-color: rgba(245,158,11,0.5); }
+    .hero-radar .ring:nth-child(3) { width: 520px; height: 520px; margin: -260px 0 0 -260px; animation: radar-pulse 3s ease-in-out infinite 1.2s; border-color: rgba(245,158,11,0.3); }
+    .hero-radar .ring:nth-child(4) { width: 680px; height: 680px; margin: -340px 0 0 -340px; animation: radar-pulse 3s ease-in-out infinite 1.8s; border-color: rgba(245,158,11,0.15); }
+    .hero-radar .sweep { position: absolute; top: 50%; left: 50%; width: 340px; height: 340px; margin-top: -340px; margin-left: 0; transform-origin: bottom left; animation: radar-sweep 4s linear infinite; background: conic-gradient(from 0deg, transparent 0deg, rgba(245,158,11,0.08) 30deg, rgba(245,158,11,0.2) 60deg, transparent 60deg); border-radius: 50%; }
+    .hero-radar .dot { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); top: 50%; left: 50%; box-shadow: 0 0 12px var(--accent); }
+    @keyframes radar-pulse { 0%,100% { opacity: 0.6; } 50% { opacity: 0.15; } }
+    @keyframes radar-sweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .hero-content { position: relative; z-index: 2; text-align: center; max-width: 800px; }
+    .hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 9999px; border: 1px solid var(--border-std); background: rgba(255,255,255,0.03); font-size: 12px; font-weight: 510; color: var(--text-tertiary); margin-bottom: 28px; }
+    .hero-badge .dot-live { width: 6px; height: 6px; border-radius: 50%; background: #10b981; animation: blink 2s infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .hero h1 { font-size: 72px; font-weight: 700; color: var(--text-primary); letter-spacing: -2.5px; line-height: 1.0; margin-bottom: 8px; }
+    .hero h1 .gold { color: var(--accent); }
+    .hero .subtitle { font-size: 22px; font-weight: 400; color: var(--text-tertiary); line-height: 1.5; margin-top: 16px; margin-bottom: 40px; }
+    .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #000; font-size: 15px; font-weight: 600; padding: 12px 28px; border-radius: 8px; transition: all 0.15s; border: none; cursor: pointer; }
+    .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(245,158,11,0.3); }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); color: var(--text-secondary); font-size: 15px; font-weight: 500; padding: 12px 28px; border-radius: 8px; border: 1px solid var(--border-std); transition: all 0.15s; cursor: pointer; }
+    .btn-ghost:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+
+    /* Sections */
+    section { padding: 100px 24px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: 13px; font-weight: 510; color: var(--accent); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px; }
+    .section-title { font-size: 42px; font-weight: 600; color: var(--text-primary); letter-spacing: -1px; line-height: 1.1; margin-bottom: 16px; }
+    .section-desc { font-size: 18px; color: var(--text-tertiary); line-height: 1.6; max-width: 600px; }
+
+    /* How it works */
+    .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 48px; }
+    .step { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px 24px; transition: all 0.2s; }
+    .step:hover { border-color: var(--border-std); background: rgba(255,255,255,0.04); }
+    .step-icon { font-size: 32px; margin-bottom: 16px; }
+    .step-num { font-size: 12px; font-weight: 510; color: var(--accent); margin-bottom: 8px; }
+    .step h3 { font-size: 17px; font-weight: 590; color: var(--text-primary); margin-bottom: 8px; letter-spacing: -0.2px; }
+    .step p { font-size: 14px; color: var(--text-tertiary); line-height: 1.6; }
+    .step-arrow { display: none; }
+
+    /* Sources */
+    .sources-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 48px; }
+    .source-group { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .source-group h3 { font-size: 14px; font-weight: 510; color: var(--accent); margin-bottom: 12px; }
+    .source-group ul { list-style: none; }
+    .source-group li { font-size: 14px; color: var(--text-secondary); padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+    .source-group li::before { content: '→'; color: var(--text-muted); font-size: 11px; }
+
+    /* Schedule */
+    .schedule-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 48px; }
+    .schedule-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px; position: relative; overflow: hidden; transition: all 0.2s; }
+    .schedule-card:hover { border-color: var(--border-std); }
+    .schedule-card .time { font-size: 48px; font-weight: 700; color: var(--text-primary); letter-spacing: -2px; line-height: 1; }
+    .schedule-card .period { font-size: 14px; color: var(--text-tertiary); margin-top: 4px; margin-bottom: 20px; }
+    .schedule-card h3 { font-size: 20px; font-weight: 590; color: var(--text-primary); margin-bottom: 10px; }
+    .schedule-card p { font-size: 15px; color: var(--text-tertiary); line-height: 1.6; }
+    .schedule-card .glow { position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; border-radius: 50%; }
+    .schedule-card.morning .glow { background: radial-gradient(circle, rgba(245,158,11,0.12), transparent); }
+    .schedule-card.evening .glow { background: radial-gradient(circle, rgba(99,102,241,0.12), transparent); }
+
+    /* Quick Start */
+    .install-box { background: var(--bg-panel); border: 1px solid var(--border-std); border-radius: var(--radius-lg); margin-top: 36px; overflow: hidden; }
+    .install-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+    .install-header span { font-size: 13px; font-weight: 510; color: var(--text-tertiary); }
+    .copy-btn { font-size: 12px; color: var(--text-tertiary); background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 4px; padding: 4px 10px; cursor: pointer; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+    .copy-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.08); }
+    .install-body { padding: 20px; }
+    .install-body code { font-size: 14px; color: var(--accent-light); line-height: 1.8; }
+    .install-body .comment { color: var(--text-muted); }
+    .install-steps { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .install-step { padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: var(--radius); }
+    .install-step .num { font-size: 12px; font-weight: 510; color: var(--accent); margin-bottom: 6px; }
+    .install-step code { font-size: 13px; color: var(--text-secondary); }
+
+    /* Architecture */
+    .arch-flow { display: flex; align-items: center; justify-content: center; gap: 0; margin-top: 48px; flex-wrap: wrap; }
+    .arch-node { background: rgba(255,255,255,0.03); border: 1px solid var(--border-std); border-radius: var(--radius); padding: 20px 28px; text-align: center; min-width: 160px; }
+    .arch-node .emoji { font-size: 28px; margin-bottom: 8px; }
+    .arch-node .label { font-size: 14px; font-weight: 510; color: var(--text-primary); }
+    .arch-node .sublabel { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+    .arch-arrow { color: var(--accent); font-size: 20px; padding: 0 12px; opacity: 0.6; }
+
+    /* Stats */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 48px; }
+    .stat { text-align: center; padding: 28px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: var(--radius); }
+    .stat .value { font-size: 48px; font-weight: 700; color: var(--accent); letter-spacing: -2px; line-height: 1; }
+    .stat .label { font-size: 14px; color: var(--text-tertiary); margin-top: 8px; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); padding: 40px 24px; text-align: center; }
+    footer p { font-size: 14px; color: var(--text-muted); }
+    footer a { color: var(--text-tertiary); }
+    footer .star { font-size: 16px; margin-top: 12px; }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 42px; letter-spacing: -1.5px; }
+      .hero .subtitle { font-size: 17px; }
+      .hero-radar { display: none; }
+      .steps, .sources-grid, .schedule-cards, .install-steps, .stats { grid-template-columns: 1fr; }
+      .section-title { font-size: 30px; }
+      .arch-flow { flex-direction: column; }
+      .arch-arrow { transform: rotate(90deg); padding: 8px 0; }
+      nav .links { display: none; }
+    }
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .sources-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="inner">
+    <div class="logo">
+      <svg viewBox="0 0 256 256" fill="none"><circle cx="128" cy="118" r="60" stroke="#f59e0b" stroke-width="1.2" opacity="0.4"/><circle cx="128" cy="118" r="30" stroke="#f59e0b" stroke-width="1" opacity="0.3"/><circle cx="128" cy="118" r="4" fill="#f59e0b"/><line x1="128" y1="126" x2="128" y2="146" stroke="#b45309" stroke-width="2" stroke-linecap="round"/><line x1="116" y1="146" x2="140" y2="146" stroke="#b45309" stroke-width="2" stroke-linecap="round"/></svg>
+      Money Radar
+    </div>
+    <div class="links">
+      <a href="#how">工作原理</a>
+      <a href="#sources">信息源</a>
+      <a href="#schedule">推送计划</a>
+      <a href="#start">快速开始</a>
+      <a class="cta-btn" href="https://github.com/lingyanou/money-radar" target="_blank">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-radar">
+    <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    <div class="sweep"></div>
+    <div class="dot"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="dot-live"></span> 系统运行中 · 19 个信息源已接入</div>
+    <h1>赚钱<span class="gold">雷达</span></h1>
+    <p class="subtitle">自动监控全网高价值信息源，AI 筛选 + 定时推送<br>让赚钱机会主动找到你</p>
+    <div class="hero-actions">
+      <a href="#start" class="btn-primary">⚡ 一键部署</a>
+      <a href="#how" class="btn-ghost">查看原理 →</a>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how">
+  <div class="section-inner">
+    <div class="section-label">How it works</div>
+    <div class="section-title">四步开启赚钱雷达</div>
+    <p class="section-desc">从信息采集到机会推送，全自动运行，你只需要看推送、做决策。</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon">📡</div>
+        <div class="step-num">Step 1</div>
+        <h3>自动监控</h3>
+        <p>持续扫描 19+ 个高价值 RSS 信息源，覆盖 AI/科技、创业、电商、中文商业等方向</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">🤖</div>
+        <div class="step-num">Step 2</div>
+        <h3>AI 筛选</h3>
+        <p>AI 从海量文章中筛选出与赚钱最相关的机会，分析变现路径、评估执行难度</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">⏰</div>
+        <div class="step-num">Step 3</div>
+        <h3>定时推送</h3>
+        <p>早 8 点速报 + 晚 8 点深度分析，推送到你的 Discord / Telegram / 微信</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">🔍</div>
+        <div class="step-num">Step 4</div>
+        <h3>深度拆解</h3>
+        <p>看到好机会？AI 帮你做市场调研、竞品分析、落地计划，直出可执行方案</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sources -->
+<section id="sources" style="background: var(--bg-panel);">
+  <div class="section-inner">
+    <div class="section-label">Intelligence Sources</div>
+    <div class="section-title">19+ 高价值信息源</div>
+    <p class="section-desc">覆盖全球最前沿的科技、商业、创业信息，每日自动采集更新。</p>
+    <div class="sources-grid">
+      <div class="source-group">
+        <h3>🤖 AI / 科技</h3>
+        <ul><li>TechCrunch AI</li><li>The Verge AI</li><li>VentureBeat AI</li><li>ArXiv CS.AI</li></ul>
+      </div>
+      <div class="source-group">
+        <h3>💡 创业风向</h3>
+        <ul><li>Hacker News</li><li>HN Show</li><li>HN Ask</li><li>Y Combinator Blog</li></ul>
+      </div>
+      <div class="source-group">
+        <h3>🇨🇳 中文商业</h3>
+        <ul><li>36氪</li><li>虎嗅</li><li>少数派</li><li>小众软件</li></ul>
+      </div>
+      <div class="source-group">
+        <h3>🛒 电商 / 增长</h3>
+        <ul><li>Ahrefs Blog</li><li>Zapier Blog</li></ul>
+      </div>
+      <div class="source-group">
+        <h3>📊 战略分析</h3>
+        <ul><li>Stratechery</li><li>Seth Godin</li><li>Wait But Why</li></ul>
+      </div>
+      <div class="source-group">
+        <h3>🚀 产品发现</h3>
+        <ul><li>Product Hunt</li><li>GitHub Trending</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Schedule -->
+<section id="schedule">
+  <div class="section-inner">
+    <div class="section-label">Push Schedule</div>
+    <div class="section-title">每天两次，机会不漏</div>
+    <p class="section-desc">早间速览快速筛选，晚间深析精准落地。</p>
+    <div class="schedule-cards">
+      <div class="schedule-card morning">
+        <div class="glow"></div>
+        <div class="time">08:00</div>
+        <div class="period">🌅 每日早间</div>
+        <h3>赚钱机会速报</h3>
+        <p>从今日新文章中筛选 5-8 条高价值机会，包含一句话概括、变现路径、执行难度和推荐指数。</p>
+      </div>
+      <div class="schedule-card evening">
+        <div class="glow"></div>
+        <div class="time">20:00</div>
+        <div class="period">🌙 每日晚间</div>
+        <h3>深度机会分析</h3>
+        <p>选取 1-2 个最值得做的机会，深度拆解：市场规模、用户画像、变现模型、风险点、30 天落地计划。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section style="background: var(--bg-panel);">
+  <div class="section-inner" style="text-align:center;">
+    <div class="section-label">Architecture</div>
+    <div class="section-title">系统架构</div>
+    <div class="arch-flow">
+      <div class="arch-node">
+        <div class="emoji">📡</div>
+        <div class="label">19+ RSS Sources</div>
+        <div class="sublabel">HN / 36kr / PH / ...</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="emoji">🗃️</div>
+        <div class="label">blogwatcher-cli</div>
+        <div class="sublabel">scan + store</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="emoji">🤖</div>
+        <div class="label">AI Filter</div>
+        <div class="sublabel">筛选 + 分析</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node">
+        <div class="emoji">💬</div>
+        <div class="label">Chat Push</div>
+        <div class="sublabel">Discord / Telegram</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Start -->
+<section id="start">
+  <div class="section-inner">
+    <div class="section-label">Quick Start</div>
+    <div class="section-title">三步启动</div>
+    <p class="section-desc">克隆、安装、配置，5 分钟内开始接收赚钱机会推送。</p>
+    <div class="install-box">
+      <div class="install-header">
+        <span>Terminal</span>
+        <button class="copy-btn" onclick="copyCode()">复制</button>
+      </div>
+      <div class="install-body">
+        <code>
+          <span class="comment"># 1. 克隆项目</span><br>
+          git clone https://github.com/lingyanou/money-radar.git<br>
+          cd money-radar<br><br>
+          <span class="comment"># 2. 一键安装</span><br>
+          chmod +x scripts/setup.sh && ./scripts/setup.sh<br><br>
+          <span class="comment"># 3. 配置定时推送（通过 Hermes cronjob）</span><br>
+          hermes cron create --name "早间速报" --schedule "0 8 * * *"<br>
+          &nbsp;&nbsp;--prompt-file config/morning-prompt.txt
+        </code>
+      </div>
+    </div>
+    <div class="install-steps">
+      <div class="install-step">
+        <div class="num">01</div>
+        <code>git clone + setup.sh</code>
+      </div>
+      <div class="install-step">
+        <div class="num">02</div>
+        <code>自动安装 blogwatcher + 19个信息源</code>
+      </div>
+      <div class="install-step">
+        <div class="num">03</div>
+        <code>hermes cron create 配置推送</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section style="background: var(--bg-panel);">
+  <div class="section-inner">
+    <div class="stats">
+      <div class="stat">
+        <div class="value">19+</div>
+        <div class="label">信息源持续监控</div>
+      </div>
+      <div class="stat">
+        <div class="value">2×</div>
+        <div class="label">每日 AI 推送</div>
+      </div>
+      <div class="stat">
+        <div class="value">5min</div>
+        <div class="label">快速部署上线</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>Money Radar · 赚钱雷达 — <a href="https://github.com/lingyanou/money-radar" target="_blank">GitHub</a> · MIT License</p>
+  <p class="star">⭐ 如果这个项目对你有帮助，给个 Star！</p>
+</footer>
+
+<script>
+function copyCode() {
+  const code = `git clone https://github.com/lingyanou/money-radar.git\ncd money-radar\nchmod +x scripts/setup.sh && ./scripts/setup.sh`;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '已复制 ✓';
+    setTimeout(() => btn.textContent = '复制', 2000);
+  });
+}
+</script>
+</body>
+</html>
